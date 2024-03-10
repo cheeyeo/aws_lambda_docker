@@ -1,0 +1,31 @@
+services:
+  lambda:
+    build:
+      context: .
+      dockerfile: ./deploy/lambda.dockerfile
+    ports:
+     - 9000:8080
+    develop:
+      watch:
+        - action: rebuild
+          path: ./lambda/lambda_function.py
+
+  proxy:
+    image: lambda-proxy
+    build:
+      context: .
+      dockerfile: ./deploy/proxy.dockerfile
+    ports:
+      - 8000:8000
+    links:
+      - lambda:lambda
+    depends_on:
+      - lambda
+    environment:
+      LAMBDA_URL: http://lambda:8080/2015-03-31/functions/function/invocations
+    develop:
+      watch:
+        - action: rebuild
+          path: ./proxy/requirements.txt
+        - action: rebuild
+          path: ./proxy/application.py
