@@ -292,3 +292,8 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+
+# ignore webapp dirs
+webapp/build
+webapp/node_modules
