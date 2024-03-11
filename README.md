@@ -1,5 +1,7 @@
 ### AWS Lambda Docker example
 
+![Webapp](app.png)
+
 Example of using Docker to package, deploy and test Lambda functions.
 
 This project builds a webapp using ReactJS that calls a APIGateway resource which has a Lambda integration on the attached routes.
