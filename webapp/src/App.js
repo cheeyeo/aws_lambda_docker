@@ -2,6 +2,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 
 
+const APIGATEWAYURL = 'http://localhost:8000';
+
 const FormX = () => {
   const [formValues, setFormValues] = useState({
     per_page: 10,
@@ -17,7 +19,7 @@ const FormX = () => {
     loadingCallback(true);
 
     axios.post(
-      'http://localhost:8000',
+      APIGATEWAYURL,
       data,
       {
         headers: {
@@ -30,6 +32,7 @@ const FormX = () => {
       reposCallback(response.data.repos);
     })
     .catch(error => {
+      console.log(error)
       loadingCallback(false);
       errCallback(error);
     });

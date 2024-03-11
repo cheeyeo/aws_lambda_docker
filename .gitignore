@@ -297,3 +297,5 @@ dist
 # ignore webapp dirs
 webapp/build
 webapp/node_modules
+
+NOTES.md

@@ -20,16 +20,6 @@ def proxy_request():
     # current_app.logger.info("TESTING...")
     lambda_url = os.environ.get("LAMBDA_URL", "http://localhost:9000/2015-03-31/functions/function/invocations")
 
-    # print(f"LAMBDA URL: {lambda_url}")
-
-    # params = {}
-    # for x in ['per_page', 'order', 'query', 'sort']:
-    #     res = request.json.get(x, None)
-    #     if res is not None:
-    #         params[x] = res
-
-    # current_app.logger.info(params)
-
     resp = requests.post(lambda_url, json={"body": request.json})
 
     res = resp.json()

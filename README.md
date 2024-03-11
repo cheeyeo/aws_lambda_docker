@@ -2,131 +2,63 @@
 
 Example of using Docker to package, deploy and test Lambda functions.
 
-
-https://docs.aws.amazon.com/lambda/latest/dg/python-image.html
-
-
-https://aws.amazon.com/cn/blogs/compute/python-3-12-runtime-now-available-in-aws-lambda/
-
-### Ref
-
-https://github.com/aws-samples/graceful-shutdown-with-aws-lambda/blob/main/python-demo/hello_world/app.py
+This project builds a webapp using ReactJS that calls a APIGateway resource which has a Lambda integration on the attached routes.
 
 
-### Run
+### Running locally
 
-```
-docker run --platform linux/amd64 -p 9000:8080 docker-image:test
-```
+To run locally, the following pre-requisites are required:
 
-To test:
-```
-curl "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{}'
+* node v20.11.1
+* docker 25.0.4
+* docker-compose v2.24.7
+* python 3.12.2
 
-curl "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{"payload":"hello world!"}'
-```
+To start the lambda and proxy services, run `docker compose watch` in the top directory.
 
+To start the webapp, navigate to `webapp` and run `yarn start`
 
-### SPA REACT JS
+Access the app via http://localhost:3000
 
-Creating single page react app to interact with the lambda function via apigateway when deployed...
+### Deployment
 
+For deploying to AWS:
 
-https://medium.com/@diegogauna.developer/creating-a-single-page-app-spa-in-react-using-react-router-db37b89b3f73
+* Create / use an ECR repository for the lambda
 
+* Build, tag and push the lambda image
+  ```
+  export AWS_PROFILE=XXX
 
-https://builtin.com/software-engineering-perspectives/react-api
+  aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin XXXX.dkr.ecr.eu-west-1.amazonaws.com
+  
+  docker build -t docker-image:test -f deploy/lambda.dockerfile .
+  
+  docker tag docker-image:test XXXX.dkr.ecr.eu-west-1.amazonaws.com/lambda-docker-test:latest
+  ```
 
+* Create the lambda function:
+  ```
+  aws lambda create-function \
+    --function-name docker-test \
+    --package-type Image \
+    --code ImageUri=XXXX.dkr.ecr.eu-west-1.amazonaws.com/lambda-docker-test:latest \
+    --role arn:aws:iam::XXXX:role/LambdaExecutionRole \
+    --region eu-west-1
+  ```
 
-https://www.digitalocean.com/community/tutorials/react-axios-react
+* To update the lambda function:
+  ```
+  aws lambda update-function-code \
+    --region eu-west-1 \
+    --function-name docker-test \
+    --image-uri XXXX.dkr.ecr.eu-west-1.amazonaws.com/lambda-docker-test:latest \
+    --publish
+  ```
 
-
-https://axios-http.com/docs/post_example
-
-
-
-
-To create a basic react app:
-```
-npx create-react-app my-app
-```
-
-
-### Integration with ApiGateway and Lambda
-
-The action for the route that calls Lambda must be set to POST else it will fail with 500 internal error
-
-
-### AWS CLI lambda commands:
-
-To publish lambda:
-```
-aws lambda create-function --function-name docker-test --package-type Image --code ImageUri=035663780217.dkr.ecr.eu-west-1.amazonaws.com/lambda-docker-test:latest --role arn:aws:iam::035663780217:role/LambdaExecutionRole --region eu-west-1
-```
-
-To update lambda:
-```
-aws lambda update-function-code --region eu-west-1 --function-name docker-test --image-uri 035663780217.dkr.ecr.eu-west-1.amazonaws.com/lambda-docker-test:latest --publish
-```
-
-The response ^ above should show an increase of the lambda version number at the end of the FunctionArn
+* Create a APIGateway resource in the required region. Create a route with POST action with a Lambda integration referencing the above lambda function
 
 
-https://react.dev/learn/rendering-lists#keeping-list-items-in-order-with-key
+### TODO:
 
-
-### Docker compose rebuild
-
-https://docs.docker.com/compose/file-watch/
-
-docker compose watch can watch lambda file changes locally and rebuild image when detected:
-```
-docker compose watch
-```
-
-tail logs:
-```
-docker compose logs -f lambda
-```
-
-To delete dangling images:
-```
-docker rmi $(docker images -f "dangling=true" -q)
-```
-
-
-
-### Forms
-
-https://www.freecodecamp.org/news/how-to-create-forms-in-react-using-react-hook-form/
-
-
-https://formik.org/docs/tutorial
-
-
-
-### Lambda return values
-
-Lambda handler may / may not return a value in the handler:
-
-https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html
-
-
-
-
-If intergrating with APIGateway will need to return a response in the following form specified here:
-
-https://docs.aws.amazon.com/apigateway/latest/developerguide/handle-errors-in-lambda-integration.html
-
-
-Note that for the proxy for local dev we need to have the same format as above^:
-```
-{
-  "error_msg": "<replaceable>string</replaceable>",
-  "error_type": "<replaceable>string</replaceable>",
-  "stack_trace": [
-    "<replaceable>string</replaceable>",
-    ...
-  ]
-}
-```
+* Add cloudformation template for creating the above resources ?
