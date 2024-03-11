@@ -76,7 +76,10 @@ def handler(event, context):
             'full_name': repo['full_name'],
             'url': repo['html_url'],
             'description': repo['description'],
-            'stars': repo['stargazers_count']
+            'stars': repo['stargazers_count'],
+            'forks': repo['forks_count'],
+            'updated_at': repo['updated_at'],
+            'open_issues': repo['open_issues']
         })
 
     return {
