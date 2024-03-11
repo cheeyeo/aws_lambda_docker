@@ -6,6 +6,9 @@ Example of using Docker to package, deploy and test Lambda functions.
 
 This project builds a webapp using ReactJS that calls a APIGateway resource which has a Lambda integration on the attached routes.
 
+The blog post for that references this project:
+
+https://www.cheeyeo.dev/aws/python/lambda/docker/docker-compose/reactjs/2024/03/11/aws-lambda/
 
 ### Running locally
 
